@@ -4,21 +4,60 @@ import socket
 import os
 import csv
 
-def fields_extraction(x):
-#	print x.sprintf("{IP:%IP.src%,%IP.dst%,}"
-#        	"{TCP:%TCP.sport%,%TCP.dport%,}"
-#        	"{UDP:%UDP.sport%,%UDP.dport%}")
+arrayOfFlows = []
+def packetSort(x):
+	temp =[]
+	bool = False
+	if arrayOfFlows is None:
+		temp.append(x)
+		arrayOfFlows.append(temp)
+	else:
+		for p in range(len(arrayOfFlows)):
+			if(x[0].type == arrayOfFlows[p][0][0].type):
+				if(x[1].src == arrayOfFlows[p][0][1].src):
+					if(x[1].dst == arrayOfFlows[p][0][1].dst):
+						if(x[2].sport == arrayOfFlows[p][0][2].sport):
+							if(x[2].dport == arrayOfFlows[p][0][2].dport):
+								arrayOfFlows[p].append(x)
+								bool = True
+								break
+		if bool == False:
+			temp.append(x)
+			arrayOfFlows.append(temp)
+
+
+
+def extractFeatures(flowarray):
+	length = []
+	sum = 0
+	min = 65535
+	max = 0
+	for packet in range(len(flowarray)):
+		length.append(flowarray[packet][1].len)
+		if flowarray[packet][1].len < min:
+			min = flowarray[packet][1].len
+		if flowarray[packet][1].len > max:
+			max = flowarray[packet][1].len
+		sum += flowarray[packet][1].len
+
+	average = sum / len(flowarray)
+	stddevsum = 0
+	for l in range(len(length)):
+		stddevsum += ((length[l] - average) ** 2)
+	stddev = math.sqrt(stddevsum/len(length))
 
 	with open('ips.csv', 'a') as csvfile:
-		filewriter = csv.writer(csvfile, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
-		if (x[IP].proto == 6):
-	    		filewriter.writerow(['TCP', x.sprintf('%IP.src%'), x.sprintf('%TCP.sport%'), x.sprintf('%IP.dst%'), x.sprintf('%TCP.dport%')])
-		elif (x[IP].proto == 17):
-			filewriter.writerow(['UDP', x.sprintf('%IP.src%'), x.sprintf('%UDP.sport%'), x.sprintf('%IP.dst%'), x.sprintf('%UDP.dport%')])
-   	print x.summary()
-   	x.show()
+        	        filewriter = csv.writer(csvfile, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL) 
+	                if (flowarray[0][1].proto == 6):
+        	                filewriter.writerow(['TCP', flowarray[0][2].sport, flowarray[0][2].dport, min, max, average, stddev])
+                	elif (flowarray[0][1].proto == 17):
+                        	filewriter.writerow(['UDP', flowarray[0][2].sport, flowarray[0][2].dport, min, max, average, stddev])
 
-    	#use x.time for time information on the pkts
 
-pkts = sniff(prn = fields_extraction, count = 10)
-print pkts[0].show()
+
+pkts = sniff(filter = 'ip', prn = packetSort, count = 5000)
+
+for p in range(len(arrayOfFlows)):
+        if len(arrayOfFlows[p]) < 1000:
+                extractFeatures(arrayOfFlows[p])
+
