@@ -27,7 +27,7 @@ def packetSort(x):
 
 
 
-def extractFeatures(flowarray):
+def extractFeatures(count, flowarray):
 	length = []
 	sum = 0
 	min = 65535
@@ -47,17 +47,16 @@ def extractFeatures(flowarray):
 	stddev = math.sqrt(stddevsum/len(length))
 
 	with open('ips.csv', 'a') as csvfile:
-        	        filewriter = csv.writer(csvfile, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL) 
-	                if (flowarray[0][1].proto == 6):
-        	                filewriter.writerow(['TCP', flowarray[0][2].sport, flowarray[0][2].dport, min, max, average, stddev])
-                	elif (flowarray[0][1].proto == 17):
-                        	filewriter.writerow(['UDP', flowarray[0][2].sport, flowarray[0][2].dport, min, max, average, stddev])
-
-
+        	        filewriter = csv.writer(csvfile, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+     	                filewriter.writerow([count, flowarray[0][1].proto, flowarray[0][2].sport, flowarray[0][2].dport, min, max, average, stddev])
 
 pkts = sniff(filter = 'ip', prn = packetSort, count = 5000)
-
+with open('ips.csv',"r") as f:
+    reader = csv.reader(f,delimiter = ",")
+    data = list(reader)
+    row_count = len(data)
 for p in range(len(arrayOfFlows)):
-        if len(arrayOfFlows[p]) < 1000:
-                extractFeatures(arrayOfFlows[p])
-
+        if len(arrayOfFlows[p]) >= 1000:
+                extractFeatures(row_count, arrayOfFlows[p])
+		print len(arrayOfFlows[p])
+		row_count += 1
