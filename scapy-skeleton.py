@@ -57,6 +57,11 @@ with open('ips.csv',"r") as f:
     row_count = len(data)
 for p in range(len(arrayOfFlows)):
         if len(arrayOfFlows[p]) >= 1000:
+<<<<<<< Updated upstream
                 extractFeatures(row_count, arrayOfFlows[p])
 		print len(arrayOfFlows[p])
 		row_count += 1
+=======
+                extractFeatures(arrayOfFlows[p])
+
+>>>>>>> Stashed changes
