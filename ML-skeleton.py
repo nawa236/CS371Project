@@ -22,7 +22,21 @@ features = ['proto', 'sport', 'dport', 'min', 'max', 'average', 'stddev']
 x = df[features]
 y = df['label']
 
-acc_scores = 0
+DT_accuracy_arr = []
+DT_f1score_arr = []
+DT_precision_arr = []
+DT_recall_arr = []
+
+NN_accuracy_arr = []
+NN_f1score_arr = []
+NN_precision_arr = []
+NN_recall_arr = []
+
+SVC_accuracy_arr = []
+SVC_f1score_arr = []
+SVC_precision_arr = []
+SVC_recall_arr = []
+
 for i in range(0, 10):
     X_train, X_test, y_train, y_test = train_test_split(x, y, test_size = 0.25)
 
@@ -32,12 +46,6 @@ for i in range(0, 10):
     
     y1_pred = clf1.predict(X_test)
     
-    DT_accuracy_arr = []
-    DT_f1score_arr = []
-    DT_precision_arr = []
-    DT_recall_arr = []
-    #print (classification_report(y_test, y_pred, target_names=x))
-
     DT_accuracy_arr.append(accuracy_score(y_test, y1_pred))
     DT_precision_arr.append(precision_score(y_test, y1_pred, average='weighted'))
     DT_recall_arr.append(recall_score(y_test, y1_pred, average='weighted'))
@@ -49,11 +57,6 @@ for i in range(0, 10):
     
     y2_pred = clf2.predict(X_test)
 
-    NN_accuracy_arr = []
-    NN_f1score_arr = []
-    NN_precision_arr = []
-    NN_recall_arr = [] 
-   
     NN_accuracy_arr.append(accuracy_score(y_test, y2_pred))
     NN_precision_arr.append(precision_score(y_test, y2_pred, average='weighted'))
     NN_recall_arr.append(recall_score(y_test, y2_pred, average='weighted'))
@@ -66,11 +69,6 @@ for i in range(0, 10):
     
     y3_pred = clf3.predict(X_test)
 
-    SVC_accuracy_arr = []
-    SVC_f1score_arr = []
-    SVC_precision_arr = []
-    SVC_recall_arr = []
-
     SVC_accuracy_arr.append(accuracy_score(y_test, y3_pred))
     SVC_precision_arr.append(precision_score(y_test, y3_pred, average='weighted'))
     SVC_recall_arr.append(recall_score(y_test, y3_pred, average='weighted'))
@@ -79,4 +77,5 @@ for i in range(0, 10):
 
 with open("scores.csv", "a") as csvfile:
 	filewriter = csv.writer(csvfile, delimiter=',', quotechar ='|', quoting=csv.QUOTE_MINIMAL)
-	filewriter.writerow([DT_accuracy_arr[0], DT_f1score_arr[0], DT_precision_arr[0], DT_recall_arr[0], NN_accuracy_arr[0], NN_f1score_arr[0], NN_precision_arr[0], NN_recall_arr[0], SVC_accuracy_arr[0], SVC_f1score_arr[0], SVC_precision_arr[0], SVC_recall_arr[0]])
+	for i in range(0, 10):
+		filewriter.writerow([DT_accuracy_arr[i], DT_f1score_arr[i], DT_precision_arr[i], DT_recall_arr[i], NN_accuracy_arr[i], NN_f1score_arr[i], NN_precision_arr[i], NN_recall_arr[i], SVC_accuracy_arr[i], SVC_f1score_arr[i], SVC_precision_arr[i], SVC_recall_arr[i]])
